@@ -86,7 +86,7 @@ class Light_House:
         running = True
 
         while running:
-            self.clock.tick(10)  # 10 FPS rendering
+            self.clock.tick(20)  # FPS rendering
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
