@@ -1,12 +1,12 @@
-from Classes import Agent, Stats
+from Classes import agent, stats
 from Envoirments import env_lighthouse
 
 if __name__ == "__main__":
-    from Classes import Agent
-    agent = Agent.Agent()
-    clusterStats = Stats.StatsCluster()
+    from Classes import agent
+    agent = agent.Agent()
+    clusterStats = stats.StatsCluster()
     for _ in range(10):
-        stats = Stats.Stats()
+        stats = stats.Stats()
         env = env_lighthouse.Light_House(agent=agent, stats=stats, light_reach=100, width=5, height=5)
         env.display_gui()
         stats.print()

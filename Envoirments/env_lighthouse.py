@@ -2,11 +2,11 @@ import pygame
 import sys
 import random
 import time
-from Classes import Agent, Stats
+from Classes import agent, stats
 
 
 class Light_House:
-    def __init__(self, agent:Agent.Agent, stats:Stats.Stats, light_reach:int = 3, width:int = 10, height:int = 10):
+    def __init__(self, agent:agent.Agent, stats:stats.Stats, light_reach:int = 3, width:int = 10, height:int = 10):
         pygame.init()
 
         self.width = width
