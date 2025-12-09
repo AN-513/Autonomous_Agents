@@ -2,7 +2,8 @@ from Classes import stats, agent
 from Envoirments import env_lighthouse
 
 if __name__ == "__main__":
-    _agent = agent.Agent()
+    _randomAgent = agent.RandomAgent()
+    _agent = agent.Agent(_randomAgent)
     clusterStats = stats.StatsCluster()
     for _ in range(10):
         _stats = stats.Stats()

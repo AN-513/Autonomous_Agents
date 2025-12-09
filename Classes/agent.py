@@ -1,11 +1,18 @@
 import time
 import random
 
-# only random for now
-class Agent:
+class RandomAgent:
     def __init__(self):
-        time.sleep(1)
+        pass
 
-    def make_decision(self, options:list):
+    def make_decision(self, options:list, observations):
         return random.choice(options)
+
+
+class Agent:
+    def __init__(self, pure_agent):
+        self.pure_agent = pure_agent
+
+    def make_decision(self, options:list, observations:dict):
+        return self.pure_agent.make_decision(options, observations)
 
