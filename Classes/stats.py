@@ -10,7 +10,8 @@ class Stats:
 
     def set_map_dimensions(self, map_dimensions: tuple):
         if self.map_dimensions != (-1, -1):
-            print("\nWARNING (stats.py): MAP DIMENSIONS ALREADY SET\n")
+            # print("\nWARNING (stats.py): MAP DIMENSIONS ALREADY SET\n")
+            pass
         self.map_dimensions = map_dimensions
 
     def set_i_distance(self, distance: int):
