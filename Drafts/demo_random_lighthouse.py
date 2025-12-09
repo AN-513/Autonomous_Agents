@@ -15,5 +15,34 @@ if __name__ == "__main__":
     clusterStats.display_plots()
     clusterStats.display_heatmap()
 
+'''
+    if __name__ == "__main__":
+        from Classes import agent
+        my_agent = agent.Agent()
+        clusterStats = stats.StatsCluster()
+
+        w = 5
+        h = 5
+        walls = 12
+
+        for i in range(5):
+            st = stats.Stats()
+
+            # Cria o ambiente
+            env = env_lighthouse.Light_House(
+                agent=my_agent,
+                stats=st,
+                light_reach=100,
+                width=w,
+                height=h,
+                num_walls=walls
+            )
+
+            env.display_gui()
+'''
+
+
+
+
 
 
