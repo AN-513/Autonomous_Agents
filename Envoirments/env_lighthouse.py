@@ -54,32 +54,69 @@ class Light_House:
             print(f"WARNING (env_lighthouse.py): TOO MANY WALLS ({num_walls}) FOR THE MAP SIZE ({height*width}) - TWO SQUARES ARE RESERVED")
             time.sleep(10)
 
-        # TODO: ADD VALIDITY LOGIC FOR WALLS
-        wall_counter = 0
-        while wall_counter < num_walls:
-            x_wall = random.randint(0, width-1)
-            y_wall = random.randint(0, height-1)
+        # --- LÓGICA DE GERAÇÃO DE MAPA VÁLIDO ---
+        map_is_valid = False
+        attempts = 0
 
-            # check lighthouse colision
-            if x_wall == self.lx and y_wall == self.ly:
-                continue
+        while not map_is_valid:
+            attempts += 1
+            self.itemsDict = {}  # Resetar dicionário de itens a cada tentativa
+            wall_counter = 0
 
-            # check agent initial position colision:
-            if x_wall == self.agent_x and y_wall == self.agent_y:
-                continue
+            while wall_counter < num_walls:
+                x_wall = random.randint(0, width-1)
+                y_wall = random.randint(0, height-1)
 
-            # check if wall is on top of another wall
-            if coords_to_key(x_wall, y_wall) in self.itemsDict:
-                continue
+                # check lighthouse colision
+                if x_wall == self.lx and y_wall == self.ly:
+                    continue
+
+                # check agent initial position colision:
+                if x_wall == self.agent_x and y_wall == self.agent_y:
+                    continue
+
+                # check if wall is on top of another wall
+                if coords_to_key(x_wall, y_wall) in self.itemsDict:
+                    continue
+
+                # all checks passed - adding wall
+                self.itemsDict[coords_to_key(x_wall, y_wall)] = items.Item(name="Wall")
+                wall_counter += 1
+
+            # VERIFICAÇÃO CRÍTICA: Existe caminho?
+            if self.check_path_exists():
+                map_is_valid = True
+
+                print(f"Mapa válido gerado na tentativa {attempts}")
+            else:
+                # Se falhar, o loop repete, apaga o itemsDict e tenta outra configuração
+                print(f"X Mapa inválido. Tentativa {attempts}...")
+                self.debug_print_map_tui()
+                pass
 
 
-            # TODO: ADD CHECK: PATH FROM AGENT TO LIGHTHOUSE MUST EXIST
+    def debug_print_map_tui(self):
+        # Percorre linha a linha (y)
+        for y in range(self.height):
+            line_str = "|"
 
-            # all checks passed - adding wall
-            wall_counter += 1
-            self.itemsDict[coords_to_key(x_wall, y_wall)] = items.Item(name="Wall")
+            # Percorre coluna a coluna (x)
+            for x in range(self.width):
+                key = coords_to_key(x, y)
 
+                if x == self.agent_x and y == self.agent_y:
+                    char = " A "  # Agente
+                elif x == self.lx and y == self.ly:
+                    char = " F "  # Farol
+                elif key in self.itemsDict and self.itemsDict[key].blocksPassage:
+                    char = "###"  # Parede
+                else:
+                    char = " . "  # Espaço vazio
 
+                line_str += char
+
+            print(line_str + "|")
+        print("-" * (self.width * 3 + 2))
 
     def is_agent_lit(self):
         dx = abs(self.agent_x - self.lx)
@@ -121,6 +158,44 @@ class Light_House:
                 valid_decision = True
                 self.agent_x, self.agent_y = new_x, new_y
                 self.stats.insert_cord((new_x, new_y))
+
+    def check_path_exists(self):
+        # Fila para o algoritmo BFS: guarda tuplos (x, y)
+        queue = [(self.agent_x, self.agent_y)]
+
+        # Conjunto de visitados para não entrar em loops
+        visited = set()
+        visited.add((self.agent_x, self.agent_y))
+
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Cima, Baixo, Dir, Esq
+
+        while len(queue) > 0:
+            cx, cy = queue.pop(0)  # Retira o primeiro da fila
+
+            # Se chegámos ao farol, o caminho existe
+            if cx == self.lx and cy == self.ly:
+                return True
+
+            # Verificar vizinhos
+            for dx, dy in directions:
+                nx, ny = cx + dx, cy + dy
+
+                # Verificar limites do mapa
+                if 0 <= nx < self.width and 0 <= ny < self.height:
+
+                    #  Verificar se é parede
+                    key = coords_to_key(nx, ny)
+                    is_blocked = False
+                    if key in self.itemsDict and self.itemsDict[key].blocksPassage:
+                        is_blocked = True
+
+                    # Se não for parede e ainda não foi visitado, adiciona à fila
+                    if not is_blocked and (nx, ny) not in visited:
+                        visited.add((nx, ny))
+                        queue.append((nx, ny))
+
+        # Se a fila esvaziar e não encontrámos o farol, não há caminho
+        return False
 
     def run(self):
         running = True
@@ -182,4 +257,6 @@ class Light_House:
                 print("Agent finished envoirment")
 
         pygame.quit()
+
+
 
