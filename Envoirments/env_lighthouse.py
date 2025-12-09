@@ -180,16 +180,16 @@ class Light_House:
             for dx, dy in directions:
                 nx, ny = cx + dx, cy + dy
 
-                # 1. Verificar limites do mapa
+                # Verificar limites do mapa
                 if 0 <= nx < self.width and 0 <= ny < self.height:
 
-                    # 2. Verificar se é parede
+                    #  Verificar se é parede
                     key = coords_to_key(nx, ny)
                     is_blocked = False
                     if key in self.itemsDict and self.itemsDict[key].blocksPassage:
                         is_blocked = True
 
-                    # 3. Se não for parede e ainda não foi visitado, adiciona à fila
+                    # Se não for parede e ainda não foi visitado, adiciona à fila
                     if not is_blocked and (nx, ny) not in visited:
                         visited.add((nx, ny))
                         queue.append((nx, ny))
