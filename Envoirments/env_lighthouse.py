@@ -142,8 +142,11 @@ class Light_House:
 
         valid_decision = False
 
+        obs_dict = {}
+
         while not valid_decision:
-            dx, dy = self.agent.make_decision(directions)
+
+            dx, dy = self.agent.make_decision(directions, observations=None)
 
             new_x = self.agent_x + dx
             new_y = self.agent_y + dy
