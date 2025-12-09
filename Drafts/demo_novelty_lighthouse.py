@@ -83,6 +83,7 @@ def main():
             dist_to_goal = abs(agent.final_pos[0] - goal_x) + abs(agent.final_pos[1] - goal_y)
 
             # 2. Score de Proximidade (Exploração guiada)
+            #TODO mudar se ele ficar preso
             proximity_score = 50 * (1 - (dist_to_goal / max_dist_possible))
             if proximity_score < 0: proximity_score = 0
 
@@ -92,7 +93,7 @@ def main():
 
             if dist_to_goal == 0:
                 # Recompensa massiva por encontrar a solução
-                success_bonus = 2000.0
+                success_bonus = 500.0
 
                 # Recompensa por rapidez: Quanto mais passos sobrarem, melhor.
                 # Exemplo: Se gastou 50 de 200 passos -> (200 - 50) * 5 = 750 pontos extra
@@ -113,7 +114,7 @@ def main():
         print(
             f"Gen {gen + 1:03}: Fit={best.fitness:.1f} | Steps={best.steps_taken} | Nov={best.novelty_score:.1f} | {status}")
 
-        # --- E. REPRODUÇÃO  ---
+       #reproducao
 
         # Elitismo: Top 5 passa direto
         num_elites = 5
@@ -136,8 +137,8 @@ def main():
 
         population = next_gen
 
-    # --- 4. VISUALIZAÇÃO FINAL ---
-    print("\n--- FIM DO TREINO ---")
+
+    print("\n--- Fim de treino ---")
 
     # Reordenar para pegar o campeão absoluto da última geração
     population.sort(key=lambda x: x.fitness, reverse=True)
