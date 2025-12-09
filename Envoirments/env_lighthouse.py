@@ -350,7 +350,7 @@ class Light_House:
         # Lista para guardar o caminho (para desenhar o rastro)
         path_trace = [(self.agent_x, self.agent_y)]
 
-        print(f"--> A visualizar replay do melhor agente ({len(dna_genome)} passos)...")
+        print(f"--> A visualizar replay do melhor agente ...")
 
         # --- FASE 1: ANIMAÇÃO ---
         while running and step < len(dna_genome):
