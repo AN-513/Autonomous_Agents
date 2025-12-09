@@ -157,6 +157,5 @@ def main():
 
     visual_env.visualize_agent(champion.dna)
 
-
 if __name__ == "__main__":
     main()
