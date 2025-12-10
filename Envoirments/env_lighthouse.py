@@ -1,8 +1,8 @@
-import pygame
 import sys
 import random
 import time
 from Classes import agent, stats, items
+
 
 def coords_to_key(x:int, y:int):
     return str(x) + "-" + str(y)
@@ -16,8 +16,8 @@ def key_to_coords(key:str):
 
 
 class Light_House:
-    def __init__(self, agent:agent.Agent, stats:stats.Stats, light_reach:int = 3, width:int = 10, height:int = 10, num_walls:int = 0):
-        pygame.init()
+    def __init__(self, agent:agent.Agent, stats:stats.Stats, light_reach:int = 3, width:int = 10, height:int = 10, num_walls:int = 0,
+                 max_steps:int = 200, random_seed:int=0):
 
         self.width = width
         self.height = height
@@ -25,11 +25,9 @@ class Light_House:
         self.light_reach = light_reach
         self.agent = agent
         self.stats = stats
+        self.max_steps = max_steps
 
-        self.window = pygame.display.set_mode((self.width * self.tile_size, self.height * self.tile_size))
-        pygame.display.set_caption("Static-Light Lighthouse Grid")
-
-        self.clock = pygame.time.Clock()
+        random.seed(random_seed)
 
         # Random lighthouse position
         self.lx = random.randint(0, width - 1)
@@ -86,37 +84,8 @@ class Light_House:
             # VERIFICAÇÃO CRÍTICA: Existe caminho?
             if self.check_path_exists():
                 map_is_valid = True
-
-                print(f"Mapa válido gerado na tentativa {attempts}")
             else:
-                # Se falhar, o loop repete, apaga o itemsDict e tenta outra configuração
-                print(f"X Mapa inválido. Tentativa {attempts}...")
-                self.debug_print_map_tui()
                 pass
-
-
-    def debug_print_map_tui(self):
-        # Percorre linha a linha (y)
-        for y in range(self.height):
-            line_str = "|"
-
-            # Percorre coluna a coluna (x)
-            for x in range(self.width):
-                key = coords_to_key(x, y)
-
-                if x == self.agent_x and y == self.agent_y:
-                    char = " A "  # Agente
-                elif x == self.lx and y == self.ly:
-                    char = " F "  # Farol
-                elif key in self.itemsDict and self.itemsDict[key].blocksPassage:
-                    char = "###"  # Parede
-                else:
-                    char = " . "  # Espaço vazio
-
-                line_str += char
-
-            print(line_str + "|")
-        print("-" * (self.width * 3 + 2))
 
     def is_agent_lit(self):
         dx = abs(self.agent_x - self.lx)
@@ -130,28 +99,70 @@ class Light_House:
         self.last_move_time = now
         return True
 
-    def agent_decision(self):
+    def agent_decision(self, skip_time_delay:bool):
 
-        if not self.is_time_to_move():
+        if not skip_time_delay and self.is_time_to_move():
             return
 
         self.stats.increment_decision()
 
         # Random direction: up/down/left/right
-        directions = [(1,0), (-1,0), (0,1), (0,-1)]
+        options = [(1,0), (-1,0), (0,1), (0,-1)]
 
         valid_decision = False
 
         obs_dict = {}
 
+        # TODO: melhorar este código
+
+        # direção relativa do farol
+        aux = [0, 0]
+        if self.lx < self.agent_x:
+            aux[0] = -1
+        elif self.lx > self.agent_x:
+            aux[0] = 1
+
+        if self.ly < self.agent_y:
+            aux[1] = -1
+        elif self.ly > self.agent_y:
+            aux[1] = 1
+
+        obs_dict["direcao_farol"] = tuple(aux)
+
+
+        # TODO: codigo feio, melhorar
+        # check valid decisions
+        invalid_options = []
+
+        for i in range(len(options)):
+            option = options[i]
+            local_option = [self.agent_x + option[0], self.agent_y + option[1]]
+            new_x = self.agent_x + local_option[0]
+            new_y = self.agent_y + local_option[1]
+
+            if (new_x >= 0) and (new_x <= self.width - 1) and (new_y >= 0) and (new_y <= self.height - 1):
+                # checking wall colision
+                if coords_to_key(new_x, new_y) in self.itemsDict:
+                    if self.itemsDict[coords_to_key(new_x, new_y)].blocksPassage:
+                        invalid_options.append(i)
+
+        obs_dict["invalid_options"] = invalid_options
+
+        # TODO: FIX THIS
+        first_run = True
         while not valid_decision:
 
-            dx, dy = self.agent.make_decision(directions, observations=None)
+            if first_run:
+                decision = self.agent.make_decision(options=options, observations=obs_dict)
+                first_run = False
+            else:
+                decision = random.choice(options)
+
+            dx, dy = decision
 
             new_x = self.agent_x + dx
             new_y = self.agent_y + dy
 
-            # TODO: ADD MORE CHECKS IN THE FUTURE
             if (new_x >= 0) and (new_x <= self.width-1) and (new_y >= 0) and (new_y <= self.height-1):
                 # checking wall colision
                 if coords_to_key(new_x, new_y) in self.itemsDict:
@@ -161,6 +172,8 @@ class Light_House:
                 valid_decision = True
                 self.agent_x, self.agent_y = new_x, new_y
                 self.stats.insert_cord((new_x, new_y))
+                break
+
 
     def check_path_exists(self):
         # Fila para o algoritmo BFS: guarda tuplos (x, y)
@@ -202,27 +215,42 @@ class Light_House:
 
     def run(self):
         running = True
+
+        num_decisions = 0
+
         while running:
+            num_decisions += 1
             # Agent movement
-            self.agent_decision()
+            self.agent_decision(skip_time_delay=True)
 
             if (self.agent_x == self.lx) and (self.agent_y == self.ly):
                 running = False
-                print("Agent finished envoirment")
+
+            if num_decisions >= self.max_steps:
+                break
+
+        distance_to_lighthouse = abs(self.agent_x - self.lx) + abs(self.agent_y - self.ly)
+        return (num_decisions, distance_to_lighthouse)
 
 
     def display_gui(self):
+        import pygame
+        pygame.init()
+        self.window = pygame.display.set_mode((self.width * self.tile_size, self.height * self.tile_size))
+        pygame.display.set_caption("Static-Light Lighthouse Grid")
+
+        self.clock = pygame.time.Clock()
         running = True
 
         while running:
-            self.clock.tick(20)  # FPS rendering
+            self.clock.tick(10)  # FPS rendering
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
 
             # Agent movement
-            self.agent_decision()
+            self.agent_decision(skip_time_delay=False)
 
             # Draw background
             self.window.fill((40, 40, 40))
