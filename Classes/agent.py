@@ -5,7 +5,7 @@ class RandomAgent:
     def __init__(self):
         pass
 
-    def make_decision(self, options:list, observations):
+    def make_decision(self, options:list, observations: dict):
         return random.choice(options)
 
 
@@ -16,16 +16,9 @@ class NEAT_Agent:
         self.config = config
         self.net = FeedForwardNetwork.create(genome,config)
 
-    def make_decision(self, options: list, observations: tuple):
-        response = self.net.activate(observations["direcao_farol"])
-        while len(response) > 0:
-            best_option = response.index(max(response))
-            if best_option in observations["invalid_options"]:
-                response.pop(best_option)
-            else:
-                break
-        if len(response) == 0:
-            print("ERROR (agent.py): NO VALID MOVE FOUND")
+    def make_decision(self, options: list, observations: dict):
+        response = self.net.activate(observations["lighthouse_direction"])
+        best_option = response.index(max(response))
         return options[best_option]
 
 
@@ -33,6 +26,14 @@ class Agent:
     def __init__(self, pure_agent):
         self.pure_agent = pure_agent
 
-    def make_decision(self, options:list, observations:dict):
-        return self.pure_agent.make_decision(options, observations)
+    def make_decision(self, options:list, observations:dict, invalid_options:list):
+        decision = self.pure_agent.make_decision(options, observations)
+        security_counter = 0
+        while decision in invalid_options:
+            decision = random.choice(options)
+            security_counter += 1
+            if security_counter % 1000 == 0:
+                print("WARNING (agent.py): stuck in invalid options!")
+                time.sleep(5)
+        return decision
 

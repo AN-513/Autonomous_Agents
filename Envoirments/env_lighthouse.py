@@ -2,25 +2,15 @@ import sys
 import random
 import time
 from Classes import agent, stats, items
-
-
-def coords_to_key(x:int, y:int):
-    return str(x) + "-" + str(y)
-
-def key_to_coords(key:str):
-    raw_numbers = key.split("-")
-    numeric_list = []
-    for n in raw_numbers:
-        numeric_list.append(int(n))
-    return numeric_list
+from Envoirments.aux_funcs import *
 
 
 class Light_House:
-    def __init__(self, agent:agent.Agent, stats:stats.Stats, light_reach:int = 3, width:int = 10, height:int = 10, num_walls:int = 0,
+    def __init__(self, agent:agent.Agent, stats:stats.Stats, light_reach:int = 3, dimensions:tuple=(7, 7), num_walls:int = 0,
                  max_steps:int = 200, random_seed:int=0):
 
-        self.width = width
-        self.height = height
+        self.width = dimensions[0]
+        self.height = dimensions[1]
         self.tile_size = 40
         self.light_reach = light_reach
         self.agent = agent
@@ -30,15 +20,16 @@ class Light_House:
         random.seed(random_seed)
 
         # Random lighthouse position
-        self.lx = random.randint(0, width - 1)
-        self.ly = random.randint(0, height - 1)
+        self.lx = random.randint(0, self.width - 1)
+        self.ly = random.randint(0, self.height - 1)
 
         # Agent starting position
-        self.agent_x = width // 2
-        self.agent_y = height - 2
+        self.agent_x = self.width // 2
+        self.agent_y = self.height - 2
 
-        self.stats.set_map_dimensions((width, height))
-        self.stats.set_i_distance(abs(self.agent_x - self.lx) + abs(self.agent_y - self.ly))
+        if self.stats:
+            self.stats.set_map_dimensions((self.width, self.height))
+            self.stats.set_i_distance(abs(self.agent_x - self.lx) + abs(self.agent_y - self.ly))
 
         # Timer for movement
         self.last_move_time = time.time()
@@ -48,8 +39,8 @@ class Light_House:
         self.itemsDict = {}
 
         # add walls
-        if num_walls >= height*width - 2:
-            print(f"WARNING (env_lighthouse.py): TOO MANY WALLS ({num_walls}) FOR THE MAP SIZE ({height*width}) - TWO SQUARES ARE RESERVED")
+        if num_walls >= self.height*self.width - 2:
+            print(f"WARNING (env_lighthouse.py): TOO MANY WALLS ({num_walls}) FOR THE MAP SIZE ({self.height*self.width}) - TWO SQUARES ARE RESERVED")
             time.sleep(10)
 
         # --- LÓGICA DE GERAÇÃO DE MAPA VÁLIDO ---
@@ -62,8 +53,8 @@ class Light_House:
             wall_counter = 0
 
             while wall_counter < num_walls:
-                x_wall = random.randint(0, width-1)
-                y_wall = random.randint(0, height-1)
+                x_wall = random.randint(0, self.width-1)
+                y_wall = random.randint(0, self.height-1)
 
                 # check lighthouse colision
                 if x_wall == self.lx and y_wall == self.ly:
@@ -104,7 +95,8 @@ class Light_House:
         if not skip_time_delay and self.is_time_to_move():
             return
 
-        self.stats.increment_decision()
+        if self.stats:
+            self.stats.increment_decision()
 
         # Random direction: up/down/left/right
         options = [(1,0), (-1,0), (0,1), (0,-1)]
@@ -113,22 +105,8 @@ class Light_House:
 
         obs_dict = {}
 
-        # TODO: melhorar este código
-
         # direção relativa do farol
-        aux = [0, 0]
-        if self.lx < self.agent_x:
-            aux[0] = -1
-        elif self.lx > self.agent_x:
-            aux[0] = 1
-
-        if self.ly < self.agent_y:
-            aux[1] = -1
-        elif self.ly > self.agent_y:
-            aux[1] = 1
-
-        obs_dict["direcao_farol"] = tuple(aux)
-
+        obs_dict["lighthouse_direction"] = get_relative_direction(self.agent_x, self.agent_y, self.lx, self.ly)
 
         # TODO: codigo feio, melhorar
         # check valid decisions
@@ -136,24 +114,24 @@ class Light_House:
 
         for i in range(len(options)):
             option = options[i]
-            local_option = [self.agent_x + option[0], self.agent_y + option[1]]
-            new_x = self.agent_x + local_option[0]
-            new_y = self.agent_y + local_option[1]
+            new_x = self.agent_x + option[0]
+            new_y = self.agent_y + option[1]
 
             if (new_x >= 0) and (new_x <= self.width - 1) and (new_y >= 0) and (new_y <= self.height - 1):
                 # checking wall colision
                 if coords_to_key(new_x, new_y) in self.itemsDict:
                     if self.itemsDict[coords_to_key(new_x, new_y)].blocksPassage:
-                        invalid_options.append(i)
+                        invalid_options.append(option)
+            else:
+                invalid_options.append(option)
 
-        obs_dict["invalid_options"] = invalid_options
 
         # TODO: FIX THIS
         first_run = True
         while not valid_decision:
 
             if first_run:
-                decision = self.agent.make_decision(options=options, observations=obs_dict)
+                decision = self.agent.make_decision(options=options, observations=obs_dict, invalid_options=invalid_options)
                 first_run = False
             else:
                 decision = random.choice(options)
@@ -171,7 +149,8 @@ class Light_House:
 
                 valid_decision = True
                 self.agent_x, self.agent_y = new_x, new_y
-                self.stats.insert_cord((new_x, new_y))
+                if self.stats:
+                    self.stats.insert_cord((new_x, new_y))
                 break
 
 

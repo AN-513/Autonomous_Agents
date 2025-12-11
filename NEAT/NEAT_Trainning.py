@@ -7,12 +7,13 @@ from Classes import agent, stats
 
 
 def eval_function(genome, config):
-    bot = agent.NEAT_Agent(genome, config)
+    neat_agent = agent.NEAT_Agent(genome, config)
+    bot = agent.Agent(neat_agent)
     statistics = stats.StatsCluster()
     fitness = 100
-    for i in range(1):
+    for i in range(10):
         stat = stats.Stats()
-        env = env_lighthouse.Light_House(bot, stat, 0, 10, 10, 0, max_steps=100, random_seed=2)
+        env = env_lighthouse.Light_House(bot, stat, 0, dimensions=(10, 10), num_walls=0, max_steps=100, random_seed=random.randint(1, 999))
         env_output = env.run()
         statistics.add_stats(stat)
         fitness -= env_output[0]
@@ -29,14 +30,16 @@ if __name__ == "__main__":
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
     population.add_reporter(neat.StdOutReporter(True))
-    filenamePrefix = r'C:\Users\Afonso Noia\PycharmProjects\Autonomous_Agents\NEAT\backups\\'
-    population.add_reporter(neat.Checkpointer(filename_prefix=filenamePrefix, generation_interval=1))
+    #filenamePrefix = r'C:\Users\Afonso Noia\PycharmProjects\Autonomous_Agents\NEAT\backups\\'
+    #population.add_reporter(neat.Checkpointer(filename_prefix=filenamePrefix, generation_interval=1))
 
     pe = neat.ParallelEvaluator(os.cpu_count(), eval_function)
 
-    winner = population.run(pe.evaluate)
+    best_genome = population.run(pe.evaluate)
+    neat_agent = agent.NEAT_Agent(best_genome, config)
+    best_agent = agent.Agent(neat_agent)
 
-    # Save the winner.
-    with open('winner', 'wb') as f:
-        pickle.dump(winner, f)
+    # Save the best agent.
+    with open('best_agent.pkl', 'wb') as f:
+        pickle.dump(best_agent, f)
 
