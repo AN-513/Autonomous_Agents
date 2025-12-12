@@ -85,14 +85,14 @@ class Light_House:
 
     def is_time_to_move(self):
         now = time.time()
-        if now - self.last_move_time < 0.1:
+        if now - self.last_move_time < 0.2:
             return False
         self.last_move_time = now
         return True
 
     def agent_decision(self, skip_time_delay:bool):
 
-        if not skip_time_delay and self.is_time_to_move():
+        if (not skip_time_delay) and not(self.is_time_to_move()):
             return
 
         if self.stats:
@@ -106,7 +106,8 @@ class Light_House:
         obs_dict = {}
 
         # direção relativa do farol
-        obs_dict["lighthouse_direction"] = get_relative_direction(self.agent_x, self.agent_y, self.lx, self.ly)
+        obs_dict["lighthouse_pos"] = (self.lx, self.ly)
+        obs_dict["agent_pos"] = (self.agent_x, self.agent_y)
 
         # TODO: codigo feio, melhorar
         # check valid decisions

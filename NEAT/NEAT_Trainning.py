@@ -3,12 +3,19 @@ import pickle
 import neat
 import os
 from Envoirments import env_lighthouse
-from Classes import agent, stats
+from Classes import agent, stats, sensor
+
+def get_sensors():
+    all_sensors = []
+    direction_sensor = sensor.DirectionSensor("lighthouse_pos")
+    all_sensors.append(sensor.Sensor(direction_sensor))
+    return all_sensors
 
 
 def eval_function(genome, config):
     neat_agent = agent.NEAT_Agent(genome, config)
-    bot = agent.Agent(neat_agent)
+    sensors = get_sensors()
+    bot = agent.Agent(neat_agent, sensors)
     statistics = stats.StatsCluster()
     fitness = 100
     for i in range(10):
@@ -37,7 +44,7 @@ if __name__ == "__main__":
 
     best_genome = population.run(pe.evaluate)
     neat_agent = agent.NEAT_Agent(best_genome, config)
-    best_agent = agent.Agent(neat_agent)
+    best_agent = agent.Agent(neat_agent, get_sensors())
 
     # Save the best agent.
     with open('best_agent.pkl', 'wb') as f:
