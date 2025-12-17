@@ -1,9 +1,10 @@
 
 class Item:
-    def __init__(self, name:str, points_for_collecting:float = 0):
+    def __init__(self, name:str, coordinates:tuple, points_for_collecting:float = 0):
         self.name = name
         self.blocksPassage = False
         self.isCollectible = False
+        self.coordinates = coordinates
         self.pointsForCollecting = points_for_collecting
 
         if name == "Wall":
@@ -24,3 +25,5 @@ class Item:
         else:
             return 0
 
+    def get_coords(self):
+        return self.coordinates

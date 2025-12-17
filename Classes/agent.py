@@ -1,5 +1,6 @@
 import time
 import random
+import sys
 
 class RandomAgent:
     def __init__(self):
@@ -23,12 +24,27 @@ class NEAT_Agent:
 
 
 class Agent:
-    def __init__(self, pure_agent, sensors:list):
+    def __init__(self, pure_agent, sensors:list, memory_size:int):
         self.pure_agent = pure_agent
         self.sensors = sensors
+        self.decision_counter = 0
+        self.decision_history = []
+        self.memory_size = memory_size
+        self.clear_memory()
+
+
+    def clear_memory(self):
+        self.decision_history = []
+        for _ in range(self.memory_size):
+            self.decision_history.append(0)
+
 
     def make_decision(self, options:list, observations:dict, invalid_options:list):
         agent_input_raw = []
+
+        if self.memory_size > 0:
+            for mem in self.decision_history:
+                agent_input_raw.append(mem)
 
         for sensor in self.sensors:
             local_input = sensor.get_sensor_data(observations)
@@ -47,7 +63,18 @@ class Agent:
             security_counter += 1
             if security_counter % 1000 == 0:
                 print("WARNING (agent.py): stuck in invalid options!")
+                print("Number of decisions:", self.decision_counter)
+                print("Decision history:", self.decision_history)
+                print("options:", options)
+                print("invalid options:", invalid_options)
                 time.sleep(5)
+                sys.exit(-1)
+
+        self.decision_counter += 1
+        self.decision_history.append(options.index(decision)/5)
+
+        if len(self.decision_history) > self.memory_size:
+            self.decision_history.pop(0)
 
         return decision
 

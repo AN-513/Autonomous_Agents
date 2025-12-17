@@ -19,8 +19,8 @@ class Stats:
     def increment_decision(self):
         self.num_decisions += 1
 
-    def insert_cord(self, cord: tuple):
-        self.cords_all.append(cord)
+    def insert_coord(self, coord: tuple):
+        self.cords_all.append(coord)
 
     def print(self):
         print("\n----- Stats -----")
