@@ -48,7 +48,7 @@ if __name__ == "__main__":
     # 2. Execução (Mesmas sementes para todos)
     seeds = [random.randint(1, 999999) for _ in range(NUM_EPISODIOS)]
 
-    print("A avaliar agentes...")
+    print("A avaliar agentes..")
     data_simple, cluster_simple = recolher_dados(simple_bot, NUM_EPISODIOS, PAREDES, seeds)
     data_smart, cluster_smart = recolher_dados(smart_bot, NUM_EPISODIOS, PAREDES, seeds)
     data_neat, cluster_neat = recolher_dados(neat_bot, NUM_EPISODIOS, PAREDES, seeds)
