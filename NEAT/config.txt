@@ -1,0 +1,85 @@
+# NEAT configuration for the bit-sequence memory experiment.
+
+# The `NEAT` section specifies parameters particular to the NEAT algorithm
+# or the experiment itself.  This is the only required section.
+# output = activation(bias+(response∗aggregation(inputs)))
+
+[NEAT]
+fitness_criterion     = max
+fitness_threshold     = 300
+pop_size              = 200
+reset_on_extinction   = 0
+no_fitness_termination = False
+
+
+[DefaultGenome]
+num_inputs              = 12
+num_hidden              = 0
+num_outputs             = 4
+initial_connection      = partial_nodirect 0.5
+feed_forward            = True
+
+compatibility_disjoint_coefficient    = 1.0
+compatibility_weight_coefficient      = 0.3
+
+enabled_rate_to_true_add = 0.0
+enabled_rate_to_false_add = 0.0
+
+conn_add_prob           = 0.12
+conn_delete_prob        = 0.1
+node_add_prob           = 0.12
+node_delete_prob        = 0.1
+
+activation_default      = relu
+activation_options      = relu
+activation_mutate_rate  = 0.00001
+
+aggregation_default     = mean
+aggregation_options     = mean
+aggregation_mutate_rate = 0.00001
+
+bias_init_mean          = 0.2
+bias_init_stdev         = 1.0
+bias_replace_rate       = 0.001
+bias_mutate_rate        = 0.05
+bias_mutate_power       = 0.1
+bias_max_value          = 1.0
+bias_min_value          = -1.0
+bias_init_type          = gaussian
+
+response_init_mean      = 0.5
+response_init_stdev     = 1.0
+response_replace_rate   = 0.001
+response_mutate_rate    = 0.05
+response_mutate_power   = 0.1
+response_max_value      = 1.5
+response_min_value      = -1.5
+response_init_type      = gaussian
+
+weight_init_mean        = 0.5
+weight_init_stdev       = 1.0
+weight_replace_rate     = 0.001
+weight_mutate_rate      = 0.05
+weight_mutate_power     = 0.1
+weight_max_value        = 1.0
+weight_min_value        = -1.0
+weight_init_type        = gaussian
+
+structural_mutation_surer	= True
+single_structural_mutation 	= True
+
+enabled_default         = True
+enabled_mutate_rate     = 0.0002
+
+[DefaultSpeciesSet]
+compatibility_threshold = 2.2
+
+[DefaultStagnation]
+species_elitism      = 0
+species_fitness_func = max
+max_stagnation       = 25
+
+[DefaultReproduction]
+min_species_size = 1
+survival_threshold = 0.3
+elitism = 5

@@ -7,7 +7,7 @@ if __name__ == "__main__":
     clusterStats = stats.StatsCluster()
     for _ in range(10):
         _stats = stats.Stats()
-        env = env_lighthouse.Light_House(agent=_agent, stats=_stats, light_reach=100, width=5, height=5, num_walls=5)
+        env = env_lighthouse.Light_House(agent=_agent, stats=_stats, light_reach=100, dimensions=(7, 7), num_walls=5)
         env.display_gui()
         _stats.print()
         print()
