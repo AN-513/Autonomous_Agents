@@ -9,6 +9,16 @@ class RandomAgent:
     def make_decision(self, options:list, agent_input:tuple):
         return random.choice(options)
 
+class GreedyAgent:
+    def __init__(self):
+        pass
+
+    def make_decision(self, options:list, agent_input:tuple):
+        decision = list(agent_input)
+        if decision[0] != 0:
+            decision[1] = 0
+        return decision
+
 
 class NEAT_Agent:
     def __init__(self, genome, config):
@@ -32,12 +42,10 @@ class Agent:
         self.memory_size = memory_size
         self.clear_memory()
 
-
     def clear_memory(self):
         self.decision_history = []
         for _ in range(self.memory_size):
             self.decision_history.append(0)
-
 
     def make_decision(self, options:list, observations:dict, invalid_options:list):
         agent_input_raw = []
@@ -56,22 +64,13 @@ class Agent:
 
         agent_input = tuple(agent_input_raw)
         decision = self.pure_agent.make_decision(options, agent_input)
-        security_counter = 0
 
         while decision in invalid_options:
             decision = random.choice(options)
-            security_counter += 1
-            if security_counter % 1000 == 0:
-                print("WARNING (agent.py): stuck in invalid options!")
-                print("Number of decisions:", self.decision_counter)
-                print("Decision history:", self.decision_history)
-                print("options:", options)
-                print("invalid options:", invalid_options)
-                time.sleep(5)
-                sys.exit(-1)
 
         self.decision_counter += 1
-        self.decision_history.append(options.index(decision)/5)
+        if self.memory_size > 0:
+            self.decision_history.append(options.index(decision)/5)
 
         if len(self.decision_history) > self.memory_size:
             self.decision_history.pop(0)

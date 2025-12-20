@@ -16,6 +16,7 @@ class Light_House:
         self.agent = agent
         self.stats = stats
         self.map_validity = True
+        self.i_distance = -1
 
         self.max_steps = max_steps
         self.discovered_positions = []
@@ -27,6 +28,7 @@ class Light_House:
         while not self.map_validity:
             self.map_validity = True
             self.generate_map(num_walls=num_walls)
+
 
     def generate_map(self, num_walls:int):
 
@@ -42,7 +44,7 @@ class Light_House:
 
         contador = 0
 
-        while self.agent_x == self.lx and self.agent_y == self.ly:
+        while (self.agent_x == self.lx and self.agent_y == self.ly) or self.is_agent_lit():
             contador += 1
             if contador >= 1000:
                 self.map_validity = False
@@ -98,9 +100,9 @@ class Light_House:
 
             if self.check_path_exists():
                 map_is_valid = True
-            else:
-                pass
 
+        self.stats.set_num_walls(num_walls)
+        self.i_distance = calc_distance(self.agent_x, self.agent_y, self.lx, self.ly)
 
     def is_map_valid(self):
         return self.map_validity
@@ -112,7 +114,7 @@ class Light_House:
 
     def is_time_to_move(self):
         now = time.time()
-        if now - self.last_move_time < 0.1:
+        if now - self.last_move_time < 0.05:
             return False
         self.last_move_time = now
         return True
@@ -139,7 +141,7 @@ class Light_House:
         obs_dict["items_dict"] = self.itemsDict
         obs_dict["light_intensity"] = 0
         if self.is_agent_lit():
-            obs_dict["light_intensity"] = self.light_reach + 1 - calc_distance(self.agent_x, self.agent_y, self.lx, self.ly)
+            obs_dict["light_intensity"] = (self.light_reach + 1 - calc_distance(self.agent_x, self.agent_y, self.lx, self.ly)) / (1+self.light_reach)
 
 
         # TODO: codigo feio, melhorar
@@ -239,6 +241,8 @@ class Light_House:
                 break
 
         distance_to_lighthouse = calc_distance(self.agent_x, self.agent_y, self.lx, self.ly)
+        if distance_to_lighthouse == 0:
+            self.stats.set_as_win()
         return (num_decisions, distance_to_lighthouse, len(self.discovered_positions))
 
     def display_gui(self):
@@ -334,6 +338,8 @@ class Light_House:
                 #print("Agent finished environment")
 
         distance_to_lighthouse = abs(self.agent_x - self.lx) + abs(self.agent_y - self.ly)
+        if distance_to_lighthouse == 0:
+            self.stats.set_as_win()
         return (num_decisions, distance_to_lighthouse, len(self.discovered_positions))
 
     def save_debug_frame(self, filename, draw_history=False):
@@ -395,3 +401,11 @@ class Light_House:
 
         pygame.image.save(surface, filename)
         pygame.quit()
+
+
+    def get_i_distance(self):
+        if self.i_distance == -1:
+            print("WARNING (env_lighthouse.py): i_distance not set!")
+            time.sleep(5)
+        else:
+            return self.i_distance
