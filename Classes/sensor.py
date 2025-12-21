@@ -1,4 +1,4 @@
-from Envoirments.aux_funcs import coords_to_key
+from Envoirments.aux_funcs import coords_to_key, calc_distance
 
 class LightSensor:
     def __init__(self):
@@ -9,6 +9,86 @@ class LightSensor:
         last_light = self.last_light
         self.last_light = light
         return [last_light, light]
+
+class LaserSensor:
+    def __init__(self, max_distance:int):
+        self.max_distance = max_distance
+
+    def _aux_get_closest_wall(self, direction:tuple ,items_dict:dict, current_coordinates:tuple):   # (left/right, up/down) - 0, 1 or -1
+        output = -1
+        local_coordinates = [-1, -1]
+
+        for x_aux in range(self.max_distance):
+            local_coordinates[0] = current_coordinates[0] + direction[0]*(x_aux + 1)
+            local_coordinates[1] = current_coordinates[1] + direction[1]*(x_aux + 1)
+            key_coords = coords_to_key(local_coordinates[0], local_coordinates[1])
+
+            if key_coords in items_dict:
+                if items_dict[key_coords].name == "Wall":
+                    wall_distance = calc_distance(current_coordinates[0], current_coordinates[1], local_coordinates[0], local_coordinates[1])
+                    output = wall_distance
+                    break  # only the closest wall matter
+
+        return output
+
+
+    def get_sensor_data(self, all_obs:dict):
+        current_coordinates = all_obs["agent_pos"]
+        items_dict = all_obs["items_dict"]
+
+        output_walls = [0, 0, 0, 0, 0, 0, 0, 0]
+        closest_wall_distance = -1
+
+        # left
+        direction = (-1, 0)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        if closest_wall_distance != -1:
+            output_walls[0] = closest_wall_distance / self.max_distance # make the value between 0 and 1
+
+        # right
+        direction = (1, 0)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        if closest_wall_distance != -1:
+            output_walls[1] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
+
+        # up
+        direction = (0, -1)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        if closest_wall_distance != -1:
+            output_walls[2] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
+
+        # down
+        direction = (0, 1)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        if closest_wall_distance != -1:
+            output_walls[3] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
+
+        # up/left
+        direction = (-1, -1)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        if closest_wall_distance != -1:
+            output_walls[4] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
+
+        # up/right
+        direction = (1, -1)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        if closest_wall_distance != -1:
+            output_walls[5] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
+
+        # down/left
+        direction = (-1, 1)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        if closest_wall_distance != -1:
+            output_walls[6] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
+
+        # down/right
+        direction = (1, 1)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        if closest_wall_distance != -1:
+            output_walls[7] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
+
+        return output_walls
+
 
 class WallSensor:
     def __init__(self, max_distance:int):
