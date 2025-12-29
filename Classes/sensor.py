@@ -14,8 +14,8 @@ class LaserSensor:
     def __init__(self, max_distance:int):
         self.max_distance = max_distance
 
-    def _aux_get_closest_wall(self, direction:tuple ,items_dict:dict, current_coordinates:tuple):   # (left/right, up/down) - 0, 1 or -1
-        output = -1
+    def _aux_get_closest_wall(self, direction:tuple ,items_dict:dict, current_coordinates:tuple, map_size:int):   # (left/right, up/down) - 0, 1 or -1
+        output = -2
         local_coordinates = [-1, -1]
 
         for x_aux in range(self.max_distance):
@@ -29,61 +29,67 @@ class LaserSensor:
                     output = wall_distance
                     break  # only the closest wall matter
 
-        return output
+        if output == -2: # no wall found
+            if local_coordinates[0] < 0 or local_coordinates[1] < 0 or local_coordinates[0] > map_size or local_coordinates[1] > map_size:
+                output = -1 # out of map
+            else:
+                output = 0 # nothing detected
 
+        return output
 
     def get_sensor_data(self, all_obs:dict):
         current_coordinates = all_obs["agent_pos"]
         items_dict = all_obs["items_dict"]
+        map_size = all_obs["env_size"][0]
 
         output_walls = [0, 0, 0, 0, 0, 0, 0, 0]
         closest_wall_distance = -1
 
         # left
         direction = (-1, 0)
-        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates, map_size=map_size)
         if closest_wall_distance != -1:
             output_walls[0] = closest_wall_distance / self.max_distance # make the value between 0 and 1
 
         # right
         direction = (1, 0)
-        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates, map_size=map_size)
         if closest_wall_distance != -1:
             output_walls[1] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
 
         # up
         direction = (0, -1)
-        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates, map_size=map_size)
         if closest_wall_distance != -1:
             output_walls[2] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
 
         # down
         direction = (0, 1)
-        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates, map_size=map_size)
         if closest_wall_distance != -1:
             output_walls[3] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
 
         # up/left
         direction = (-1, -1)
-        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates, map_size=map_size)
         if closest_wall_distance != -1:
             output_walls[4] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
 
         # up/right
         direction = (1, -1)
-        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates, map_size=map_size)
         if closest_wall_distance != -1:
             output_walls[5] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
 
         # down/left
         direction = (-1, 1)
-        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates, map_size=map_size)
         if closest_wall_distance != -1:
             output_walls[6] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
 
         # down/right
         direction = (1, 1)
-        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates)
+        closest_wall_distance = self._aux_get_closest_wall(direction=direction, items_dict=items_dict, current_coordinates=current_coordinates, map_size=map_size)
         if closest_wall_distance != -1:
             output_walls[7] = closest_wall_distance / self.max_distance  # make the value between 0 and 1
 

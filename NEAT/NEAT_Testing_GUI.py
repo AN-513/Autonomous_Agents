@@ -15,7 +15,7 @@ def get_direction_sensor(reference_name):
 bulk_stats = stats.StatsCluster()
 
 # Load the best agent.
-with open('neat_2_2.pkl', 'rb') as f:
+with open('neat.pkl', 'rb') as f:
     neat_agent = pickle.load(f)
 
 greedy_raw = agent.GreedyAgent()
@@ -26,13 +26,17 @@ random_agent = agent.Agent(random_raw, [], 0)
 
 _agent = neat_agent
 
-for i in range(1000):
+
+for i in range(2200):
+    if i%100 == 0:
+        print("Tested:", i, "simulations")
     _stats = stats.Stats()
-    dim = int(5 + i/100)
-    num_walls = 5*int(i/50)
+    dim = 25
+    num_walls = 15*int(i/100)
     #num_walls = 0
-    env = env_lighthouse.Light_House(agent=_agent, stats=_stats, light_reach=0, dimensions=(dim,dim), num_walls=num_walls, max_steps=200, random_seed=random.randint(0, 9999999))
-    env.run() #.display_gui()
+    env = env_lighthouse.Light_House(agent=_agent, stats=_stats, light_reach=0, dimensions=(dim,dim), num_walls=num_walls, max_steps=2*dim+2*num_walls, random_seed=random.randint(0, 9999999))
+    #env.display_gui()
+    env.run()
     bulk_stats.add_stats(_stats)
 
 bulk_stats.display_plots()

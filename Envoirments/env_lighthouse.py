@@ -11,7 +11,7 @@ class Light_House:
 
         self.width = dimensions[0]
         self.height = dimensions[1]
-        self.tile_size = 40
+        self.tile_size = 30
         self.light_reach = light_reach
         self.agent = agent
         self.stats = stats
@@ -24,13 +24,13 @@ class Light_House:
         random.seed(random_seed)
         #print("seed:", random_seed)
 
-        self.generate_map(num_walls=num_walls)
+        self.generate_map(num_walls=num_walls, prevent_spawn_in_light=False)
         while not self.map_validity:
             self.map_validity = True
-            self.generate_map(num_walls=num_walls)
+            self.generate_map(num_walls=num_walls, prevent_spawn_in_light=False)
 
 
-    def generate_map(self, num_walls:int):
+    def generate_map(self, num_walls:int, prevent_spawn_in_light:bool):
 
         # Random lighthouse position
         self.lx = random.randint(0, self.width - 1)
@@ -44,7 +44,7 @@ class Light_House:
 
         contador = 0
 
-        while (self.agent_x == self.lx and self.agent_y == self.ly) or self.is_agent_lit():
+        while (self.agent_x == self.lx and self.agent_y == self.ly) or (self.is_agent_lit() and prevent_spawn_in_light):
             contador += 1
             if contador >= 1000:
                 self.map_validity = False
@@ -101,7 +101,8 @@ class Light_House:
             if self.check_path_exists():
                 map_is_valid = True
 
-        self.stats.set_num_walls(num_walls)
+        if self.stats:
+            self.stats.set_num_walls(num_walls)
         self.i_distance = calc_distance(self.agent_x, self.agent_y, self.lx, self.ly)
 
     def is_map_valid(self):
@@ -178,8 +179,10 @@ class Light_House:
                 first_run = False
             else:
                 decision = random.choice(options)
+                print("Warning (env_lighthouse.py): Random decision")
 
             dx, dy = decision
+            self.agent.add_decision_to_memory(options.index(tuple(decision)))
 
             new_x = self.agent_x + dx
             new_y = self.agent_y + dy
@@ -241,7 +244,7 @@ class Light_House:
                 break
 
         distance_to_lighthouse = calc_distance(self.agent_x, self.agent_y, self.lx, self.ly)
-        if distance_to_lighthouse == 0:
+        if distance_to_lighthouse == 0 and self.stats:
             self.stats.set_as_win()
         return (num_decisions, distance_to_lighthouse, len(self.discovered_positions))
 
