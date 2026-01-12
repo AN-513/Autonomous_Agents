@@ -5,7 +5,7 @@ from Classes import agent, stats, items
 from Envoirments.aux_funcs import *
 
 
-class Light_House:
+class Light_House_Maze:
     def __init__(self, agent:agent.Agent, stats:stats.Stats, light_reach:int = 3, dimensions:tuple=(7, 7), num_walls:int = 0,
                  max_steps:int = 200, random_seed:int=0):
 
@@ -66,7 +66,7 @@ class Light_House:
         # add walls
         if num_walls >= self.height * self.width - 2:
             print(
-                f"WARNING (env_lighthouse.py): TOO MANY WALLS ({num_walls}) FOR THE MAP SIZE ({self.height * self.width}) - TWO SQUARES ARE RESERVED")
+                f"WARNING (envoirment.py): TOO MANY WALLS ({num_walls}) FOR THE MAP SIZE ({self.height * self.width}) - TWO SQUARES ARE RESERVED")
             time.sleep(10)
 
         # --- LÓGICA DE GERAÇÃO DE MAPA VÁLIDO ---
@@ -179,7 +179,7 @@ class Light_House:
                 first_run = False
             else:
                 decision = random.choice(options)
-                print("Warning (env_lighthouse.py): Random decision")
+                print("Warning (envoirment.py): Random decision")
 
             dx, dy = decision
             self.agent.add_decision_to_memory(options.index(tuple(decision)))
@@ -408,7 +408,7 @@ class Light_House:
 
     def get_i_distance(self):
         if self.i_distance == -1:
-            print("WARNING (env_lighthouse.py): i_distance not set!")
+            print("WARNING (envoirment.py): i_distance not set!")
             time.sleep(5)
         else:
             return self.i_distance

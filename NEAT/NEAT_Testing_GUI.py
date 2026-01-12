@@ -4,7 +4,7 @@ import neat
 import os
 
 from Classes.agent import Agent
-from Envoirments import env_lighthouse
+from Envoirments import envoirment
 from Classes import agent, stats, sensor
 
 def get_direction_sensor(reference_name):
@@ -15,7 +15,7 @@ def get_direction_sensor(reference_name):
 bulk_stats = stats.StatsCluster()
 
 # Load the best agent.
-with open('neat.pkl', 'rb') as f:
+with open('neat_2624.pkl', 'rb') as f:
     neat_agent = pickle.load(f)
 
 greedy_raw = agent.GreedyAgent()
@@ -34,7 +34,7 @@ for i in range(2200):
     dim = 25
     num_walls = 15*int(i/100)
     #num_walls = 0
-    env = env_lighthouse.Light_House(agent=_agent, stats=_stats, light_reach=0, dimensions=(dim,dim), num_walls=num_walls, max_steps=2*dim+2*num_walls, random_seed=random.randint(0, 9999999))
+    env = envoirment.Light_House_Maze(agent=_agent, stats=_stats, light_reach=0, dimensions=(dim, dim), num_walls=num_walls, max_steps=2 * dim + 2 * num_walls, random_seed=random.randint(0, 9999999))
     #env.display_gui()
     env.run()
     bulk_stats.add_stats(_stats)
