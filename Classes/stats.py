@@ -104,12 +104,7 @@ class StatsCluster:
         plt.show()
 
     def plot_win_rate_by_map_size(self, save_path: str = None):
-        """
-        Plot the probability of winning a game based on map size.
 
-        Args:
-            save_path: Optional file path to save the figure
-        """
         if len(self.stats) == 0:
             print("No stats available for plotting.")
             return
@@ -161,12 +156,7 @@ class StatsCluster:
         plt.show()
 
     def plot_win_rate_by_num_walls(self, save_path: str = None):
-        """
-        Plot the probability of winning a game based on number of walls.
 
-        Args:
-            save_path: Optional file path to save the figure
-        """
         if len(self.stats) == 0:
             print("No stats available for plotting.")
             return

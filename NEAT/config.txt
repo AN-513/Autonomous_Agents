@@ -6,17 +6,17 @@
 
 [NEAT]
 fitness_criterion     = max
-fitness_threshold     = 300
+fitness_threshold     = 99999999
 pop_size              = 200
-reset_on_extinction   = 0
+reset_on_extinction   = 1
 no_fitness_termination = False
 
 
 [DefaultGenome]
-num_inputs              = 12
+num_inputs              = 46
 num_hidden              = 0
 num_outputs             = 4
-initial_connection      = partial_nodirect 0.5
+initial_connection      = partial_nodirect 1.0
 feed_forward            = True
 
 compatibility_disjoint_coefficient    = 1.0
@@ -25,10 +25,10 @@ compatibility_weight_coefficient      = 0.3
 enabled_rate_to_true_add = 0.0
 enabled_rate_to_false_add = 0.0
 
-conn_add_prob           = 0.12
-conn_delete_prob        = 0.1
-node_add_prob           = 0.12
-node_delete_prob        = 0.1
+conn_add_prob           = 0.03
+conn_delete_prob        = 0.01
+node_add_prob           = 0.03
+node_delete_prob        = 0.01
 
 activation_default      = relu
 activation_options      = relu
@@ -72,14 +72,14 @@ enabled_default         = True
 enabled_mutate_rate     = 0.0002
 
 [DefaultSpeciesSet]
-compatibility_threshold = 2.2
+compatibility_threshold = 2.0
 
 [DefaultStagnation]
 species_elitism      = 0
 species_fitness_func = max
-max_stagnation       = 25
+max_stagnation       = 20
 
 [DefaultReproduction]
-min_species_size = 1
+min_species_size = 0
 survival_threshold = 0.3
 elitism = 5

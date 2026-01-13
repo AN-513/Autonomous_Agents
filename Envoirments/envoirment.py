@@ -5,13 +5,13 @@ from Classes import agent, stats, items
 from Envoirments.aux_funcs import *
 
 
-class Light_House:
+class Light_House_Maze:
     def __init__(self, agent:agent.Agent, stats:stats.Stats, light_reach:int = 3, dimensions:tuple=(7, 7), num_walls:int = 0,
                  max_steps:int = 200, random_seed:int=0):
 
         self.width = dimensions[0]
         self.height = dimensions[1]
-        self.tile_size = 40
+        self.tile_size = 30
         self.light_reach = light_reach
         self.agent = agent
         self.stats = stats
@@ -22,15 +22,14 @@ class Light_House:
         self.discovered_positions = []
 
         random.seed(random_seed)
-        #print("seed:", random_seed)
 
-        self.generate_map(num_walls=num_walls)
+        self.generate_map(num_walls=num_walls, prevent_spawn_in_light=False)
         while not self.map_validity:
             self.map_validity = True
-            self.generate_map(num_walls=num_walls)
+            self.generate_map(num_walls=num_walls, prevent_spawn_in_light=False)
 
 
-    def generate_map(self, num_walls:int):
+    def generate_map(self, num_walls:int, prevent_spawn_in_light:bool):
 
         # Random lighthouse position
         self.lx = random.randint(0, self.width - 1)
@@ -44,7 +43,7 @@ class Light_House:
 
         contador = 0
 
-        while (self.agent_x == self.lx and self.agent_y == self.ly) or self.is_agent_lit():
+        while (self.agent_x == self.lx and self.agent_y == self.ly) or (self.is_agent_lit() and prevent_spawn_in_light):
             contador += 1
             if contador >= 1000:
                 self.map_validity = False
@@ -66,7 +65,7 @@ class Light_House:
         # add walls
         if num_walls >= self.height * self.width - 2:
             print(
-                f"WARNING (env_lighthouse.py): TOO MANY WALLS ({num_walls}) FOR THE MAP SIZE ({self.height * self.width}) - TWO SQUARES ARE RESERVED")
+                f"WARNING (envoirment.py): TOO MANY WALLS ({num_walls}) FOR THE MAP SIZE ({self.height * self.width}) - TWO SQUARES ARE RESERVED")
             time.sleep(10)
 
         # --- LÓGICA DE GERAÇÃO DE MAPA VÁLIDO ---
@@ -101,7 +100,8 @@ class Light_House:
             if self.check_path_exists():
                 map_is_valid = True
 
-        self.stats.set_num_walls(num_walls)
+        if self.stats:
+            self.stats.set_num_walls(num_walls)
         self.i_distance = calc_distance(self.agent_x, self.agent_y, self.lx, self.ly)
 
     def is_map_valid(self):
@@ -144,7 +144,6 @@ class Light_House:
             obs_dict["light_intensity"] = (self.light_reach + 1 - calc_distance(self.agent_x, self.agent_y, self.lx, self.ly)) / (1+self.light_reach)
 
 
-        # TODO: codigo feio, melhorar
         # check valid decisions
         invalid_options = []
 
@@ -178,8 +177,10 @@ class Light_House:
                 first_run = False
             else:
                 decision = random.choice(options)
+                print("Warning (envoirment.py): Random decision")
 
             dx, dy = decision
+            self.agent.add_decision_to_memory(options.index(tuple(decision)))
 
             new_x = self.agent_x + dx
             new_y = self.agent_y + dy
@@ -241,7 +242,7 @@ class Light_House:
                 break
 
         distance_to_lighthouse = calc_distance(self.agent_x, self.agent_y, self.lx, self.ly)
-        if distance_to_lighthouse == 0:
+        if distance_to_lighthouse == 0 and self.stats:
             self.stats.set_as_win()
         return (num_decisions, distance_to_lighthouse, len(self.discovered_positions))
 
@@ -335,7 +336,6 @@ class Light_House:
 
             if (self.agent_x == self.lx) and (self.agent_y == self.ly):
                 running = False
-                #print("Agent finished environment")
 
         distance_to_lighthouse = abs(self.agent_x - self.lx) + abs(self.agent_y - self.ly)
         if distance_to_lighthouse == 0:
@@ -405,7 +405,7 @@ class Light_House:
 
     def get_i_distance(self):
         if self.i_distance == -1:
-            print("WARNING (env_lighthouse.py): i_distance not set!")
+            print("WARNING (envoirment.py): i_distance not set!")
             time.sleep(5)
         else:
             return self.i_distance
