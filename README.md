@@ -25,3 +25,7 @@ Para executar o código, entra na pasta `NEAT` e executa o ficheiro pretendido:
     pip install neat-python
     pip install matplotlib
     pip install numpy
+
+## Trabalho realizado por:
+- Afonso Nóia 123288
+- Tomás Francisco 124107
