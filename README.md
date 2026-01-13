@@ -13,7 +13,8 @@ Para executar o código, entra na pasta `NEAT` e executa o ficheiro pretendido:
   Executa um conjunto de testes em mapas aleatórios e, no final, gera **três gráficos**, que são utilizados no relatório.
 
 - **`NEAT_Trainning.py`**  
-  Treina agentes NEAT com base nos sensores definidos na função `get_sensors()`.
+  Treina agentes NEAT com base nos sensores definidos na função `get_sensors()`, a memória está no inicio do ficheiro na constante `MEMORY_SIZE`.  O `RECURSIVE_SIZE` foi uma funcionalidade que não melhorou o desempenho do agente daí deixarmos a zero, conforme explicado na secção de sensores do relatório.
+    O melhor agente será guardado com o nome `neat_[fitness].pickle` 
 
   
   **Nota importante:**  

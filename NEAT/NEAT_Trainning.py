@@ -12,6 +12,7 @@ from Classes import agent, stats, sensor
 MEMORY_SIZE = 3
 RECURSIVE_SIZE = 0
 
+# constantes para permitir registar sempre o melhor agente num ficheiro e apagar o anterior
 GLOBAL_BEST_FITNESS = None
 GLOBAL_BEST_FILE = None
 SAVE_LOCK = None
