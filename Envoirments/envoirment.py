@@ -22,7 +22,6 @@ class Light_House_Maze:
         self.discovered_positions = []
 
         random.seed(random_seed)
-        #print("seed:", random_seed)
 
         self.generate_map(num_walls=num_walls, prevent_spawn_in_light=False)
         while not self.map_validity:
@@ -145,7 +144,6 @@ class Light_House_Maze:
             obs_dict["light_intensity"] = (self.light_reach + 1 - calc_distance(self.agent_x, self.agent_y, self.lx, self.ly)) / (1+self.light_reach)
 
 
-        # TODO: codigo feio, melhorar
         # check valid decisions
         invalid_options = []
 
@@ -338,7 +336,6 @@ class Light_House_Maze:
 
             if (self.agent_x == self.lx) and (self.agent_y == self.ly):
                 running = False
-                #print("Agent finished environment")
 
         distance_to_lighthouse = abs(self.agent_x - self.lx) + abs(self.agent_y - self.ly)
         if distance_to_lighthouse == 0:

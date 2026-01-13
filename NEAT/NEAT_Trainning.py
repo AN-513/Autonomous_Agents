@@ -12,11 +12,9 @@ from Classes import agent, stats, sensor
 MEMORY_SIZE = 3
 RECURSIVE_SIZE = 0
 
-# ======= globals populated in main / workers =======
 GLOBAL_BEST_FITNESS = None
 GLOBAL_BEST_FILE = None
 SAVE_LOCK = None
-# ===================================================
 
 def load_best_from_disk():
     best_fitness = -1
@@ -60,6 +58,8 @@ def eval_function(genome, config):
     best_fitness = -9999999999
 
     basic_fitness = 0
+    fitness_with_novelty_search = 0
+
     counter_wins = 0
     n_walls = 0
     MAX_ATTEMPTS = 5
@@ -73,24 +73,27 @@ def eval_function(genome, config):
         while True:
             seed = random.random()
             size_map = 20
+            max_steps = 2 * size_map + 2 * n_walls
+
             env = envoirment.Light_House_Maze(
                 bot,
                 None,
                 light_reach=size_map,
                 dimensions=(size_map, size_map),
                 num_walls=n_walls,
-                max_steps=2 * size_map + 2 * n_walls,
+                max_steps=max_steps,
                 random_seed=seed
             )
 
             env_output = env.run()
 
             if env_output[1] == 0:
+                fitness_with_novelty_search += 1 + 0.1*round(env_output[2]/env_output[0], 5)
                 basic_fitness += 1
                 counter_wins += 1
                 n_walls = int(counter_wins / (2 * MAX_ATTEMPTS))
             else:
-                fitness_list.append(basic_fitness)
+                fitness_list.append(fitness_with_novelty_search)    # todo: IMPORTANT
                 best_fitness = max(fitness_list)
                 break
 
@@ -127,7 +130,7 @@ def eval_function(genome, config):
 if __name__ == "__main__":
     multiprocessing.freeze_support()
 
-    MAX_GENERATIONS = 2000
+    MAX_GENERATIONS = 20000
 
     # ---- create shared state safely ----
     manager = multiprocessing.Manager()
