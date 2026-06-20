@@ -96,8 +96,8 @@ class StatsCluster:
         # Plot heatmap
         plt.figure(figsize=(6, 6))
         plt.imshow(heat, cmap="hot", origin="lower")
-        plt.colorbar(label="Frequência")
-        plt.title("Heatmap combinado de todos os Stats")
+        plt.colorbar(label="Frequency")
+        plt.title("Combined Heatmap of all Stats")
         plt.xlabel("X")
         plt.ylabel("Y")
 

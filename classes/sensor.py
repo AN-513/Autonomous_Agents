@@ -1,4 +1,4 @@
-from Envoirments.aux_funcs import coords_to_key, calc_distance
+from environments.aux_funcs import coords_to_key, calc_distance
 
 class LightSensor:
     def __init__(self):

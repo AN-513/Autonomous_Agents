@@ -3,9 +3,9 @@ import pickle
 import neat
 import os
 
-from Classes.agent import Agent
-from Envoirments import envoirment
-from Classes import agent, stats, sensor
+from classes.agent import Agent
+from environments import environment
+from classes import agent, stats, sensor
 
 def get_direction_sensor(reference_name):
     _ds = sensor.DirectionSensor(reference_name)
@@ -33,7 +33,7 @@ for i in range(2200):
     _stats = stats.Stats()
     dim = 25
     num_walls = 15*int(i/100)
-    env = envoirment.Light_House_Maze(agent=_agent, stats=_stats, light_reach=0, dimensions=(dim, dim), num_walls=num_walls, max_steps=2 * dim + 2 * num_walls, random_seed=random.randint(0, 9999999))
+    env = environment.Light_House_Maze(agent=_agent, stats=_stats, light_reach=0, dimensions=(dim, dim), num_walls=num_walls, max_steps=2 * dim + 2 * num_walls, random_seed=random.randint(0, 9999999))
     env.run()
     bulk_stats.add_stats(_stats)
 

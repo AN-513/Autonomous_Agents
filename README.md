@@ -1,31 +1,30 @@
 # Autonomous Agents
 
-Este repositório contém a implementação de agentes autónomos utilizando **NEAT**.
+This repository contains the implementation of autonomous agents using **NEAT**.
 
-## Execução
+## Execution
 
-Para executar o código basta entrar na pasta `NEAT` e executar o ficheiro pretendido:
+To run the code, simply navigate to the `neat` folder and execute the desired file:
 
-- ### **`NEAT_GUI_Display.py`**  
-  Executa um dos agentes (aleatório, *greedy* ou NEAT) com interface gráfica conforme selecionado na constante `_agent`
+- ### **`gui_display.py`**  
+  Runs one of the agents (random, *greedy*, or NEAT) with a graphical interface as selected in the `_agent` constant.
 
-- ### **`NEAT_Testing.py`**  
-  Executa um conjunto de testes em mapas aleatórios e, no final, gera **três gráficos**, que são utilizados no relatório.
+- ### **`testing.py`**  
+  Runs a set of tests on random maps and, at the end, generates **three charts**, which are used in the report.
 
-- ### **`NEAT_Trainning.py`**  
-  Treina agentes NEAT com base nos sensores definidos na função `get_sensors()`, a memória está no inicio do ficheiro na constante `MEMORY_SIZE`.  O `RECURSIVE_SIZE` foi uma funcionalidade que não melhorou o desempenho do agente daí deixarmos a zero, conforme explicado na secção de sensores do relatório.
-    O melhor agente será guardado com o nome `neat_[fitness].pickle` 
+- ### **`training.py`**  
+  Trains NEAT agents based on the sensors defined in the `get_sensors()` function, the memory is at the beginning of the file in the `MEMORY_SIZE` constant. `RECURSIVE_SIZE` was a feature that didn't improve the agent's performance, hence we leave it at zero, as explained in the sensors section of the report.
+  The best agent will be saved with the name `neat_[fitness].pickle`.
 
-  
-  **Nota importante:**  
-  Sempre que o número de sensores ou as suas configurações forem alteradas, é necessário atualizar também o ficheiro `config.txt`, garantindo que o número de *inputs* coincide com a nova configuração dos sensores.
+  **Important Note:**  
+  Whenever the number of sensors or their configurations are changed, it is necessary to also update the `config.txt` file, ensuring that the number of *inputs* matches the new sensor configuration.
 
-## Requisitos
+## Requirements
 
     pip install neat-python
     pip install matplotlib
     pip install numpy
 
-## Trabalho realizado por:
+## Work done by:
 - Afonso Nóia 123288
 - Tomás Francisco 124107

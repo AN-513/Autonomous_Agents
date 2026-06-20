@@ -5,14 +5,14 @@ import math
 import neat
 import os
 import multiprocessing
-from Envoirments import envoirment
-from Classes import agent, stats, sensor
+from environments import environment
+from classes import agent, stats, sensor
 
 
 MEMORY_SIZE = 3
 RECURSIVE_SIZE = 0
 
-# constantes para permitir registar sempre o melhor agente num ficheiro e apagar o anterior
+# constants to allow always saving the best agent in a file and deleting the previous one
 GLOBAL_BEST_FITNESS = None
 GLOBAL_BEST_FILE = None
 SAVE_LOCK = None
@@ -76,7 +76,7 @@ def eval_function(genome, config):
             size_map = 20
             max_steps = 2 * size_map + 2 * n_walls
 
-            env = envoirment.Light_House_Maze(
+            env = environment.Light_House_Maze(
                 bot,
                 None,
                 light_reach=size_map,

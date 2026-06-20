@@ -1,9 +1,8 @@
 import sys
 import random
 import time
-from Classes import agent, stats, items
-from Envoirments.aux_funcs import *
-
+from classes import agent, stats, items
+from environments.aux_funcs import *
 
 class Light_House_Maze:
     def __init__(self, agent:agent.Agent, stats:stats.Stats, light_reach:int = 3, dimensions:tuple=(7, 7), num_walls:int = 0,
@@ -65,16 +64,16 @@ class Light_House_Maze:
         # add walls
         if num_walls >= self.height * self.width - 2:
             print(
-                f"WARNING (envoirment.py): TOO MANY WALLS ({num_walls}) FOR THE MAP SIZE ({self.height * self.width}) - TWO SQUARES ARE RESERVED")
+                f"WARNING (environment.py): TOO MANY WALLS ({num_walls}) FOR THE MAP SIZE ({self.height * self.width}) - TWO SQUARES ARE RESERVED")
             time.sleep(10)
 
-        # --- LÓGICA DE GERAÇÃO DE MAPA VÁLIDO ---
+        # --- VALID MAP GENERATION LOGIC ---
         map_is_valid = False
         attempts = 0
 
         while not map_is_valid:
             attempts += 1
-            self.itemsDict = {}  # Resetar dicionário de itens a cada tentativa
+            self.itemsDict = {}  # Reset items dictionary on each attempt
             wall_counter = 0
 
             while wall_counter < num_walls:
@@ -134,7 +133,7 @@ class Light_House_Maze:
 
         obs_dict = {}
 
-        # direção relativa do farol
+        # relative direction of the lighthouse
         obs_dict["lighthouse_pos"] = (self.lx, self.ly)
         obs_dict["agent_pos"] = (self.agent_x, self.agent_y)
         obs_dict["env_size"] = (self.width, self.height)
@@ -177,7 +176,7 @@ class Light_House_Maze:
                 first_run = False
             else:
                 decision = random.choice(options)
-                print("Warning (envoirment.py): Random decision")
+                print("Warning (environment.py): Random decision")
 
             dx, dy = decision
             self.agent.add_decision_to_memory(options.index(tuple(decision)))
@@ -405,7 +404,7 @@ class Light_House_Maze:
 
     def get_i_distance(self):
         if self.i_distance == -1:
-            print("WARNING (envoirment.py): i_distance not set!")
+            print("WARNING (environment.py): i_distance not set!")
             time.sleep(5)
         else:
             return self.i_distance
