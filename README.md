@@ -26,5 +26,5 @@ To run the code, simply navigate to the `neat` folder and execute the desired fi
     pip install numpy
 
 ## Work done by:
-- Afonso Nóia 123288
-- Tomás Francisco 124107
+- Afonso Nóia
+- Tomás Francisco
